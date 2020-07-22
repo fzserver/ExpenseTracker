@@ -24,6 +24,7 @@ class _TextDetectScreenState extends State<TextDetectScreen> {
   bool _isTextLoaded = false;
   String _text = "";
   File _pickedImage;
+  String amn = "loading..";
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +71,18 @@ class _TextDetectScreenState extends State<TextDetectScreen> {
               SizedBox(
                 height: 16,
               ),
-              Center(child: SelectableText(_extractText)),
+              Center(
+                  child: Row(
+                    children: [
+                      Text(
+                        'Total : '
+                      ),
+                      Text(
+                        amn
+                      ),
+
+                    ],
+              )),
             ],
           ),
         ),
@@ -91,17 +103,26 @@ class _TextDetectScreenState extends State<TextDetectScreen> {
     VisionText readText = await recognizeText.processImage(ourImage);
 
     String input = readText.text;
+    RegExp exp = RegExp(r"(\w+)");
+    String amount = "Total";
 
     setState(() {
       _extractText = input;
       _isTextLoaded = true;
     });
+    for (TextBlock block in readText.blocks) {
+      for (TextLine line in block.lines) {
+        if (exp.hasMatch(line.text)) {
+          amount = line.text;
+        }
+      }
+    }
 
-    // translator.translate(input, to: 'en').then((_translatedText) => {
-    //       setState(() {
-    //         _text = _translatedText;
-    //         _isTextLoaded = true;
-    //       })
-    //     });
+    if (this.mounted) {
+      setState(() {
+        amn = amount;
+      });
+    }
+
   }
 }
